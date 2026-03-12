@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="UTF-8">
+<title>Cmentarz Online</title>
+
+<style>
+body{
+    font-family: Arial, sans-serif;
+    background:#111;
+    color:white;
+    margin:0;
+    text-align:center;
+}
+
+header{
+    background:black;
+    padding:20px;
+    font-size:28px;
+}
+
+.container{
+    max-width:900px;
+    margin:auto;
+    padding:20px;
+}
+
+input, textarea{
+    width:100%;
+    padding:10px;
+    margin:5px 0;
+    border-radius:6px;
+    border:none;
+}
+
+button{
+    padding:10px 15px;
+    background:#444;
+    color:white;
+    border:none;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#666;
+}
+
+.grave{
+    background:#1b1b1b;
+    margin-top:20px;
+    padding:15px;
+    border-radius:10px;
+}
+
+.candle{
+    font-size:24px;
+}
+
+.message{
+    background:#222;
+    padding:8px;
+    margin-top:5px;
+    border-radius:5px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+🕯️ Cmentarz Online
+</header>
+
+<div class="container">
+
+<h2>Dodaj osobę</h2>
+
+<input id="name" placeholder="Imię i nazwisko">
+<input id="years" placeholder="np. 1950 - 2020">
+<textarea id="desc" placeholder="Opis / wspomnienie"></textarea>
+
+<button onclick="addGrave()">Dodaj</button>
+
+<hr>
+
+<div id="graves"></div>
+
+</div>
+
+<script>
+
+let graves = JSON.parse(localStorage.getItem("graves")) || []
+
+function save(){
+localStorage.setItem("graves", JSON.stringify(graves))
+}
+
+function addGrave(){
+
+let name = document.getElementById("name").value
+let years = document.getElementById("years").value
+let desc = document.getElementById("desc").value
+
+if(!name) return alert("Podaj imię")
+
+graves.push({
+name,
+years,
+desc,
+candles:0,
+messages:[]
+})
+
+save()
+render()
+}
+
+function addCandle(i){
+graves[i].candles++
+save()
+render()
+}
+
+function addMessage(i){
+
+let msg = prompt("Twoja wiadomość pamięci")
+
+if(!msg) return
+
+graves[i].messages.push(msg)
+
+save()
+render()
+}
+
+function render(){
+
+let html = ""
+
+graves.forEach((g,i)=>{
+
+html += `
+<div class="grave">
+
+<h3>${g.name}</h3>
+<p>${g.years}</p>
+<p>${g.desc}</p>
+
+<div class="candle">
+🕯️ ${g.candles}
+</div>
+
+<button onclick="addCandle(${i})">Zapal znicz</button>
+<button onclick="addMessage(${i})">Dodaj wiadomość</button>
+
+<div>
+${g.messages.map(m=>`<div class="message">${m}</div>`).join("")}
+</div>
+
+</div>
+`
+
+})
+
+document.getElementById("graves").innerHTML = html
+
+}
+
+render()
+
+</script>
+
+</body>
+</html>
